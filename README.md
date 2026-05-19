@@ -1,4 +1,6 @@
-# Embedded Project - Smart Home
+# Smart Home - Preliminar scripts
+
+This branch contents only the preliminar codes of the different functions and the main of the project.
 
 Smart Room Automation System with STM32 Nucleo F446RE
 
