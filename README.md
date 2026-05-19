@@ -5,7 +5,7 @@ Smart Room Automation System with STM32 Nucleo F446RE
 Using:
 
 * STMicroelectronics STM32 F446RE
-* Espressif Systems ESP32
+* Espressif Systems ESP8266MOD
 * MB-102 power module
 * Servo SG90
 * 5V Fan
