@@ -2,6 +2,7 @@
 
 This branch contents only the preliminar codes of the different functions and the main of the project.
 
+# BUZZER - buzzer.h & buzzer.c
 Smart Room Automation System with STM32 Nucleo F446RE
 
 Using:
