@@ -62,4 +62,34 @@ OTYPER = controls the output type of pins, each pin uses 1 bit only
 
 - GPIOB->PUPDR &= ~(0x03 << 20); //NO PULL-UP / PULL-DOWN
 
+The instruction disables both pull-up and pull-down resistors on pin PB10, leaving it in a floating state (unless externally driven).
+
 <img width="536" height="304" alt="image" src="https://github.com/user-attachments/assets/a74ccdb4-9824-4b86-803d-2b4e3d1d9356" />
+
+- GPIOB->ODR &= ~(0x1 << 10); //INITIAL STATE = OFF
+
+This instruction drives pin PB10 low.
+
+1. GPIOB->ODR, This is the Output Data Register. Each bit corresponds to one GPIO pin’s output value.
+
+2. (0x1 << 10), 0x1 = binary 0001. Shift left by 10 → targets bit 10. This corresponds to pin PB10
+
+3. ~(0x1 << 10), Inverts the mask → all bits = 1 except bit 10 = 0.
+
+4. &=, Bitwise AND clears bit 10 while leaving all other bits unchanged.
+
+<img width="521" height="253" alt="image" src="https://github.com/user-attachments/assets/f1b52a03-2ef1-421a-a302-23357ee4af02" />
+
+- Funtion void Buzzer_On(void) //*TURN BUZZER ON
+
+GPIOB->ODR |= (0x1 << 10); 
+
+The instruction (0x1 << 10) → selects bit 10 → pin PB10. Then |= (bitwise OR) → sets that bit to 1. Result: PB10 = HIGH (1)
+
+- Function void Buzzer_Off(void) //TURN BUZZER OFF
+
+GPIOB->ODR &= ~(0x1 << 10);
+
+The instruction (0x1 << 10) → selects PB10. Then ~ → inverts → clears that bit. After that, &= → forces bit to 0. Result: PB10 = LOW (0).
+
+- The other functions are set of sounds that depends on these explained before.
