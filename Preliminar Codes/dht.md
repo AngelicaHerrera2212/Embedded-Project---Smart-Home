@@ -1,4 +1,4 @@
-# BUZZER - buzzer.c Description
+# DHT - dht.c Description
 
 To connect the buzzer module, we used the diagrams below. 
 
