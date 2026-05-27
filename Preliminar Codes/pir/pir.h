@@ -3,5 +3,6 @@
 #include "main.h"
 // PIR SENSOR MODULE - GPIO: PC2 -> PIR OUTPUT
 void PIR_Init(void);
-uint8_t PIR_Detected(void);
+uint8_t PIR_RawRead(void);
+uint8_t PIR_HardMovementDetected(void);
 #endif
