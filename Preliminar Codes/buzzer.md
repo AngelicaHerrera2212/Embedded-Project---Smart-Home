@@ -6,6 +6,9 @@ To connect the buzzer module, we used the diagrams below.
 
   <img width="209" height="163" alt="image" src="https://github.com/user-attachments/assets/3ba1d86b-6673-4f7d-ad88-1f66a9307a9a" />
 
+  <img width="87" height="194" alt="Screenshot 2026-05-28 012722" src="https://github.com/user-attachments/assets/7d1b531a-0131-49ff-8a3f-228e881e7e2d" />
+
+
 Buzzer code description:
 -	RCC->AHB1ENR |= (0x1 << 1); //ENABLE GPIOB CLOCK
 Session 6.3.10 - RCC AHB1 peripheral clock enable register (RCC_AHB1ENR)
