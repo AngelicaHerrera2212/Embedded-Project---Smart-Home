@@ -4,6 +4,7 @@ To connect the buzzer module, we used the diagrams below.
 
   <img width="265" height="326" alt="image" src="https://github.com/user-attachments/assets/fd7ea216-967f-4861-a096-f5f04e7b4532" /> 
   <img width="249" height="183" alt="image" src="https://github.com/user-attachments/assets/3ba1d86b-6673-4f7d-ad88-1f66a9307a9a" />
+<img width="370" height="221" alt="image" src="https://github.com/user-attachments/assets/213d6646-3e1e-4314-8aa7-fab3157ea63b" />
 
 Buzzer code description:
 -	RCC->AHB1ENR |= (0x1 << 1); //ENABLE GPIOB CLOCK
