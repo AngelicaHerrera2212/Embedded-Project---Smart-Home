@@ -109,13 +109,13 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-      /* CONDITIONS:
+	  /* CONDITIONS:
        * If: temperature > 22°C AND motion detected
        * THEN: turn ON all LEDs AND activate buzzer sounds
        */
       if (DHT_Read(&temperature, &humidity))
       {
-          if ((temperature > 22.0f) && (PIR_Detected()))
+          if ((temperature > 22.0f) && PIR_HardMovementDetected())
           {
               LEDs_On();
               Buzzer_AllSounds();
