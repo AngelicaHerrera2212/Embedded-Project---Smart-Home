@@ -20,3 +20,6 @@ The system includes password-based door access with servo motor control, automat
 
 * <img width="1536" height="1024" alt="WhatsApp Image 2026-05-19 at 21 31 10" src="https://github.com/user-attachments/assets/de24d044-f108-4f67-a6cc-6ffd22a56197" />
 
+Connections eschematic:
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/84bb79df-c5ad-4578-b288-2d0d0e3b39d4" />
