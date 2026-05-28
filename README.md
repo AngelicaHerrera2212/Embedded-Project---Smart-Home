@@ -14,7 +14,7 @@ Using:
 * LEDs
 * Buzzer
 
-* Description: The Smart Room Automation System is a miniature smart home prototype controlled by an STM32 F446RE microcontroller. The project integrates wireless communication, automation, sensors, and actuators to simulate the operation of a modern intelligent room inside a custom laser-cut wooden model. Communication with the system is achieved through an ESP8266 WiFi module connected to a mobile application.
+Description: The Smart Room Automation System is a miniature smart home prototype controlled by an STM32 F446RE microcontroller. The project integrates wireless communication, automation, sensors, and actuators to simulate the operation of a modern intelligent room inside a custom laser-cut wooden model. Communication with the system is achieved through an ESP8266 WiFi module connected to a mobile application.
 
 The system includes password-based door access with servo motor control, automatic and manual lighting modes using a PIR motion sensor, and environmental monitoring with a DHT sensor. Additionally, the fan speed is controlled dynamically according to the temperature difference using PWM-based proportional control. The project combines concepts from embedded systems, real-time control, wireless communication, and smart home automation.
 
