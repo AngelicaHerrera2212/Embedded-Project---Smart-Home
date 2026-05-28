@@ -18,7 +18,7 @@ Description: The Smart Room Automation System is a miniature smart home prototyp
 
 The system includes password-based door access with servo motor control, automatic and manual lighting modes using a PIR motion sensor, and environmental monitoring with a DHT sensor. Additionally, the fan speed is controlled dynamically according to the temperature difference using PWM-based proportional control. The project combines concepts from embedded systems, real-time control, wireless communication, and smart home automation.
 
-* <img width="1536" height="1024" alt="WhatsApp Image 2026-05-19 at 21 31 10" src="https://github.com/user-attachments/assets/de24d044-f108-4f67-a6cc-6ffd22a56197" />
+<img width="1536" height="1024" alt="WhatsApp Image 2026-05-19 at 21 31 10" src="https://github.com/user-attachments/assets/de24d044-f108-4f67-a6cc-6ffd22a56197" />
 
 Connections eschematic:
 
