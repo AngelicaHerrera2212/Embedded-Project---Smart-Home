@@ -34,3 +34,21 @@ AHB1 Peripheral Clock Enable Register, this register controls which peripherals 
 (0x1 << 2): 0x1 = binary 0001 << 2 shifts it left by 2 → becomes 0000 0100 (bit 2 set).
 |= (bitwise OR assignment): Sets bit 2 without affecting other bits in the register.
 
+<img width="975" height="731" alt="image" src="https://github.com/user-attachments/assets/e9c65b3b-f3d7-4406-b8d6-77d8de81e0da" />
+
+- CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk // ENABLE DWT COUNTER, used for microsecond timing
+
+Used to enable and start the CPU cycle counter using the ARM Cortex‑M debug/trace unit (not GPIO this time).
+CoreDebug = core debug registers (part of Cortex‑M CPU)
+
+/*DEMCR = Debug Exception and Monitor Control Register
+TRCENA = Trace Enable bit
+CoreDebug_DEMCR_TRCENA_Msk = A mask with the TRCENA bit set
+CYCCNTENA = Cycle counter enable bit*/
+
+1. CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk: Sets the TRCENA bit (bit 24) in DEMCR. This enables the trace and debug block, including: DWT (Data Watchpoint and Trace), ITM (Instrumentation Trace Macrocell), cycle counter.
+
+2. DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk. Sets the cycle counter enable bit. This turns on the CPU cycle counter (DWT->CYCCNT).
+
+
+
