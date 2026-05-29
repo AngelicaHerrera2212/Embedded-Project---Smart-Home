@@ -18,10 +18,7 @@ DHT Description Code
 
 - static void delay_us(uint32_t us) //MICROSECOND DELAY
 
-Creates a blocking delay of us microseconds (µs). DHT11 needs timing like:
-20–40 µs LOW pulses
-70 µs HIGH pulses
-
+Creates a blocking delay of us microseconds (µs). DHT11 needs timing like: 20–40 µs LOW pulses, 70 µs HIGH pulses.
 Normal HAL_Delay() is millisecond-based, so it’s too slow, that’s why this is needed.
 
 1. uint32_t start = DWT->CYCCNT: Read current CPU cycle counter. It increments every clock cycle, cts like a
@@ -32,3 +29,8 @@ high-resolution timer. Example: If CPU = 72 MHz, 72 million counts per second, 1
 3. while ((DWT->CYCCNT - start) < ticks):
 
 - RCC->AHB1ENR |= (0x1 << 2); // ENABLE GPIOC CLOCK
+
+AHB1 Peripheral Clock Enable Register, this register controls which peripherals (like GPIO ports) receive a clock signal.
+(0x1 << 2): 0x1 = binary 0001 << 2 shifts it left by 2 → becomes 0000 0100 (bit 2 set).
+|= (bitwise OR assignment): Sets bit 2 without affecting other bits in the register.
+
