@@ -19,7 +19,7 @@ Select bit 1 from AHB1ENR that is GPIOB, then use OR bitwise compares to turn sp
 
 2.	1 → move it to position bit 1. Then shift by left means you go from 0000 0001 to 0000 0010. Result: (0x1 << 1) = 0x2.
 3.	|= → set that bit in the register.
- <img width="242" height="113" alt="image" src="https://github.com/user-attachments/assets/280c4083-9d41-4356-a392-15225a712fa7" />
+- <img width="242" height="113" alt="image" src="https://github.com/user-attachments/assets/280c4083-9d41-4356-a392-15225a712fa7" />
 - <img width="500" height="378" alt="image" src="https://github.com/user-attachments/assets/229b0688-d1ef-431f-9236-7c8dd23ecb67" />
 
 -	GPIOB->MODER &= ~(0x03 << 20);  // Clear bits [21:20]
@@ -46,10 +46,12 @@ MODER = Mode register
  <img width="236" height="183" alt="image" src="https://github.com/user-attachments/assets/23e9d80e-e7ea-45ec-b875-27cabd951c7e" />
 
 3.	|= → set that bit in the register, bit 20 is set to 1, and bit 21 stays whatever it was before. If any bit of the comparison is 1 then set to 1.
- <img width="222" height="058" alt="image" src="https://github.com/user-attachments/assets/b7b28f96-8740-4262-bc16-3d7d9c86a42a" />
 
--	GPIOB->OTYPER &= ~ (0x1 << 10); //OUTPUT TYPE: 0 = PUSH-PULL, 1 = OPEN-DRAIN
+<img width="222" height="058" alt="image" src="https://github.com/user-attachments/assets/b7b28f96-8740-4262-bc16-3d7d9c86a42a" />
+
+GPIOB->OTYPER &= ~ (0x1 << 10); //OUTPUT TYPE: 0 = PUSH-PULL, 1 = OPEN-DRAIN
 OTYPER = controls the output type of pins, each pin uses 1 bit only
+
 1.	0x1 → one active bit and shift to position 10.
    <img width="236" height="094" alt="image" src="https://github.com/user-attachments/assets/46577c72-bea9-48ff-a997-f3e2e80e35cb" />
 
