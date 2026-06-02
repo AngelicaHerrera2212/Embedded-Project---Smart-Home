@@ -34,8 +34,7 @@ MODER = Mode register
 3.	&= → apply AND (the result is 1 only if both bits are 1). So, bits 21 and 20 are forced to 0 and all other bits remain unchanged.
  <img width="272" height="130" alt="image" src="https://github.com/user-attachments/assets/d2f7736d-2825-4b8c-a0ae-536629650ad6" />
 
- 
-<img width="272" height="180" alt="image" src="https://github.com/user-attachments/assets/4e5511f1-d97e-4e72-8bfa-399374d11aa4" />
+- <img width="272" height="180" alt="image" src="https://github.com/user-attachments/assets/4e5511f1-d97e-4e72-8bfa-399374d11aa4" />
 
 
  <img width="540" height="325" alt="image" src="https://github.com/user-attachments/assets/bfcf7859-b6b8-43c2-a731-1fa82636ad9b" />
