@@ -34,7 +34,7 @@ AHB1 Peripheral Clock Enable Register, this register controls which peripherals 
 (0x1 << 2): 0x1 = binary 0001 << 2 shifts it left by 2 → becomes 0000 0100 (bit 2 set).
 |= (bitwise OR assignment): Sets bit 2 without affecting other bits in the register.
 
-<img width="975" height="731" alt="image" src="https://github.com/user-attachments/assets/e9c65b3b-f3d7-4406-b8d6-77d8de81e0da" />
+<img width="425" height="331" alt="image" src="https://github.com/user-attachments/assets/e9c65b3b-f3d7-4406-b8d6-77d8de81e0da" />
 
 - CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk // ENABLE DWT COUNTER, used for microsecond timing
 
