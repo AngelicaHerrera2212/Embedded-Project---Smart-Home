@@ -20,7 +20,7 @@ Select bit 1 from AHB1ENR that is GPIOB, then use OR bitwise compares to turn sp
 2.	1 → move it to position bit 1. Then shift by left means you go from 0000 0001 to 0000 0010. Result: (0x1 << 1) = 0x2.
 3.	|= → set that bit in the register.
  <img width="242" height="113" alt="image" src="https://github.com/user-attachments/assets/280c4083-9d41-4356-a392-15225a712fa7" />
- <img width="500" height="378" alt="image" src="https://github.com/user-attachments/assets/229b0688-d1ef-431f-9236-7c8dd23ecb67" />
+- <img width="500" height="378" alt="image" src="https://github.com/user-attachments/assets/229b0688-d1ef-431f-9236-7c8dd23ecb67" />
 
 -	GPIOB->MODER &= ~(0x03 << 20);  // Clear bits [21:20]
 Session 7.4.1 - GPIO port mode register (GPIOx_MODER) (x = A..H)
@@ -33,8 +33,7 @@ MODER = Mode register
 
 3.	&= → apply AND (the result is 1 only if both bits are 1). So, bits 21 and 20 are forced to 0 and all other bits remain unchanged.
  <img width="272" height="130" alt="image" src="https://github.com/user-attachments/assets/d2f7736d-2825-4b8c-a0ae-536629650ad6" />
-
-- <img width="272" height="180" alt="image" src="https://github.com/user-attachments/assets/4e5511f1-d97e-4e72-8bfa-399374d11aa4" />
+<img width="272" height="180" alt="image" src="https://github.com/user-attachments/assets/4e5511f1-d97e-4e72-8bfa-399374d11aa4" />
 
 
  <img width="540" height="325" alt="image" src="https://github.com/user-attachments/assets/bfcf7859-b6b8-43c2-a731-1fa82636ad9b" />
