@@ -59,6 +59,9 @@ CCR1 = 1500 / 1500 µs = 1.5 ms
 
 CCR1 = 2000 / 2000 µs = 2 ms
 
+- void Servo_Init(void): contents the configuration of the registers for the servo module.
 
+1. RCC->AHB1ENR |= (0x1 << 0); // Enable GPIOA clock
+    
 
 
