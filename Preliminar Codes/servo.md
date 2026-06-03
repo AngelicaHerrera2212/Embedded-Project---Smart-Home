@@ -63,8 +63,11 @@ CCR1 = 2000 / 2000 µs = 2 ms
 
 1. RCC->AHB1ENR |= (0x1 << 0); // Enable GPIOA clock. Session 6.3.10 - RCC AHB1 peripheral clock enable register (RCC_AHB1ENR) RCC = Reset and Clock Control. Select bit 0 from AHB1ENR that is GPIOA, then use OR bitwise compares to turn specifically this bit on (it turns ON the bit without affecting other bits), finally set the bit to 1.
 
-  
-
+ <img width="449" height="371" alt="image" src="https://github.com/user-attachments/assets/ef22c6ea-47a1-491d-87e5-54a39adc5ff5" />
  
+2. RCC->APB2ENR |= (0x1 << 0); // Enable TIM1 clock. Session 6.3.14 - RCC APB2 peripheral clock enable register (RCC_APB2ENR). Select bit 0 from APB2ENR that is TIM1, then use OR bitwise compares to turn specifically this bit on (it turns ON the bit without affecting other bits), finally set the bit to 1.
 
+ <img width="449" height="371" alt="image" src="https://github.com/user-attachments/assets/3dc47178-fcd8-46bc-a4dd-4ffc616388dd" />
+
+3. 
 
