@@ -3,8 +3,7 @@
 #include "main.h"
 /* FAN + DHT CONTROL MODULE
  * Fan PWM pin: PB6 -> TIM4_CH1
- * DHT pin: PC1 -> handled by dht.c
- */
+ * DHT pin: PC1 -> handled by dht.c */
 void FanControl_Init(void);
 void FanControl_Update(void);
 float FanControl_GetTemperature(void);
