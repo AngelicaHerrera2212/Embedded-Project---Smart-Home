@@ -49,7 +49,7 @@ MODER = Mode register
 
 <img width="222" height="058" alt="image" src="https://github.com/user-attachments/assets/b7b28f96-8740-4262-bc16-3d7d9c86a42a" />
 
-GPIOB->OTYPER &= ~ (0x1 << 10); //OUTPUT TYPE: 0 = PUSH-PULL, 1 = OPEN-DRAIN
+- GPIOB->OTYPER &= ~ (0x1 << 10); //OUTPUT TYPE: 0 = PUSH-PULL, 1 = OPEN-DRAIN
 OTYPER = controls the output type of pins, each pin uses 1 bit only
 
 1.	0x1 → one active bit and shift to position 10.
