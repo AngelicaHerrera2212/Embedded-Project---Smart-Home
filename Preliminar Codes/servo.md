@@ -61,7 +61,10 @@ CCR1 = 2000 / 2000 µs = 2 ms
 
 - void Servo_Init(void): contents the configuration of the registers for the servo module.
 
-1. RCC->AHB1ENR |= (0x1 << 0); // Enable GPIOA clock
-    
+1. RCC->AHB1ENR |= (0x1 << 0); // Enable GPIOA clock. Session 6.3.10 - RCC AHB1 peripheral clock enable register (RCC_AHB1ENR) RCC = Reset and Clock Control. Select bit 0 from AHB1ENR that is GPIOA, then use OR bitwise compares to turn specifically this bit on (it turns ON the bit without affecting other bits), finally set the bit to 1.
+
+  
+
+ 
 
 
