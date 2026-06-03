@@ -3,8 +3,7 @@
 #include "main.h"
 /* SERVO MODULE
  * Servo signal pin: PA8 -> TIM1_CH1
- * Used for door opening/closing.
- */
+ * Used for door opening/closing. */
 void Servo_Init(void);
 void Servo_SetAngle(uint8_t angle);
 void Servo_OpenDoor(void);
