@@ -69,5 +69,27 @@ CCR1 = 2000 / 2000 µs = 2 ms
 
  <img width="449" height="371" alt="image" src="https://github.com/user-attachments/assets/3dc47178-fcd8-46bc-a4dd-4ffc616388dd" />
 
-3. 
+3. GPIOA->MODER &= ~(0x03 << 16); // Clear bits [17:16] - Apply Mask and force to 0.
+GPIOA->MODER |=  (0x02 << 16); // Set PA8 as OUTPUT - OR.
+
+<img width="440" height="277" alt="image" src="https://github.com/user-attachments/assets/72e0bbfd-e0c7-4181-8294-38713c6e017b" />
+
+4. GPIOA->AFR[1] &= ~(0x0F << 0); / GPIOA->AFR[1] |=  (0x01 << 0); // Select AF1 for PA8. PA8 -> TIM1_CH1. It configures PA8 to be connected to TIM1 Channel 1 (PWM output). Session 7.4.9 and 7.4.10.
+
+AFR = Alternate Function Register. It selects which peripheral is connected to the pin. STM32 splits AFR into two registers: AFR[0] is AFRL (low) and AFR[1] is AFRH (high).
+
+- <img width="310" height="91" alt="image" src="https://github.com/user-attachments/assets/4973417a-f21f-40d9-98a2-86c8a24f8424" />
+
+- <img width="440" height="287" alt="image" src="https://github.com/user-attachments/assets/09c71e4c-f732-4ba9-a2ff-7b6fac661efa" />
+
+- <img width="440" height="317" alt="image" src="https://github.com/user-attachments/assets/b40ce80a-308b-497d-abcd-b546abab2bc7" />
+
+Each pin needs 4 bits to choose its function. For PA8, we use bits 3:0. 
+
+GPIOA->AFR[1] &= ~(0x0F << 0): Clear the bits, 0x0F = 1111 (4 bits) then apply Mask and force to 0 the bits.
+
+GPIOA->AFR[1] |=  (0x01 << 0); Set the function, 0x01 = 0001, goes into bits [3:0] that is AF1.
+
+<img width="305" height="166" alt="image" src="https://github.com/user-attachments/assets/045d3f7a-a9fb-4f94-9cd0-93c12712968c" />
+
 
