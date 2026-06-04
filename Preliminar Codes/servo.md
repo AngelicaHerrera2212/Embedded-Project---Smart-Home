@@ -92,4 +92,9 @@ GPIOA->AFR[1] |=  (0x01 << 0); Set the function, 0x01 = 0001, goes into bits [3:
 
 <img width="305" height="166" alt="image" src="https://github.com/user-attachments/assets/045d3f7a-a9fb-4f94-9cd0-93c12712968c" />
 
+5. GPIOA->OTYPER &= ~(0x1 << 8); // Push-pull
 
+
+
+7. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down
+   
