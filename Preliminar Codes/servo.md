@@ -3,7 +3,7 @@
 To connect the servo motor, we used the diagrams below.
 
 - <img width="289" height="208" alt="image" src="https://github.com/user-attachments/assets/a53ea6ee-5289-4fc6-aec2-9331f157c9ab" />
-- <img width="314" height="454" alt="image" src="https://github.com/user-attachments/assets/b4ebc1ce-713e-4e2f-a820-40bdbf645e27" />
+- <img width="289" height="234" alt="image" src="https://github.com/user-attachments/assets/b4ebc1ce-713e-4e2f-a820-40bdbf645e27" />
 
 Servo for Door Control Code Description.
 
@@ -93,7 +93,16 @@ GPIOA->AFR[1] |=  (0x01 << 0); Set the function, 0x01 = 0001, goes into bits [3:
 <img width="305" height="166" alt="image" src="https://github.com/user-attachments/assets/045d3f7a-a9fb-4f94-9cd0-93c12712968c" />
 
 5. GPIOA->OTYPER &= ~(0x1 << 8); // Push-pull: Controls the output type of pins, each pin uses 1 bit only
-0x1 → one active bit and shift to position 8.
 
-7. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down
+- 0x1 → one active bit and shift to position 8.
+- ~ → apply bitwise NOT, this inverts all the bits.
+- &= → apply AND (the result is 1 only if both bits are 1). So, bit 8 is forced to 0 and all other bits remain unchanged.
+- Bit 8 = 0 → Push-Pull mode. To ensure the bit becomes 0, regardless of its previous value.
+
+<img width="471" height="236" alt="image" src="https://github.com/user-attachments/assets/4c2d9fa6-e7d5-425c-921a-aa78d646f418" />
+
+6. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down: The instruction disables both pull-up and pull-down resistors on pin PB10, leaving it in a floating state (unless externally driven).
+
+<img width="471" height="267" alt="image" src="https://github.com/user-attachments/assets/f2bc03e3-2e9b-49b0-87a1-5021a2537489" />
+
    
