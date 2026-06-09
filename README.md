@@ -23,3 +23,5 @@ The system includes password-based door access with servo motor control, automat
 Connections eschematic:
 
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/84bb79df-c5ad-4578-b288-2d0d0e3b39d4" />
+
+<img width="665" height="654" alt="image" src="https://github.com/user-attachments/assets/88128042-66ad-405d-8c47-48d62985b50e" />
