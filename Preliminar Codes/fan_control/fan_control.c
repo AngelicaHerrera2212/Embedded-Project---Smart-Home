@@ -9,8 +9,7 @@
  * This is a proportional control approach, similar to a simple PID
  * but using only the P term. The function FanControl_Update() should
  * be called repeatedly inside while(1).
- * HAL_GetTick() is used only to avoid reading the DHT too fast.
- */
+ * HAL_GetTick() is used only to avoid reading the DHT too fast. */
 
 // USER CONFIGURATION
 
@@ -26,8 +25,7 @@
  * 0 = normal MOSFET / transistor driver, PWM HIGH = fan ON
  * 1 = inverted driver, PWM LOW = fan ON
  *
- * If you use a normal NPN/MOSFET low-side driver, keep this as 0.
- */
+ * If you use a normal NPN/MOSFET low-side driver, keep this as 0. */
 
 #define FAN_PWM_INVERTED      0
 
@@ -42,8 +40,7 @@ static uint32_t last_dht_read_time = 0;
  * PB6 is configured as Alternate Function 2:
  * PB6 -> TIM4_CH1
  *
- * TIM4 generates PWM signal for fan speed control.
- */
+ * TIM4 generates PWM signal for fan speed control. */
 void FanControl_Init(void)
 {
     // Enable GPIOB clock
@@ -135,8 +132,7 @@ static void Fan_SetPWM(uint8_t duty_percent)
  * This function:
  * 1. Reads DHT temperature/humidity every 2 seconds.
  * 2. Calculates temperature error.
- * 3. Converts error into PWM fan speed.
- */
+ * 3. Converts error into PWM fan speed. */
 void FanControl_Update(void)
 {
     uint32_t now = HAL_GetTick();
