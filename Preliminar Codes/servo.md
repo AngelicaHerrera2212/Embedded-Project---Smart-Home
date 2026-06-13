@@ -105,4 +105,20 @@ GPIOA->AFR[1] |=  (0x01 << 0); Set the function, 0x01 = 0001, goes into bits [3:
 
 <img width="471" height="267" alt="image" src="https://github.com/user-attachments/assets/f2bc03e3-2e9b-49b0-87a1-5021a2537489" />
 
-   
+7. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down:
+
+<img width="461" height="273" alt="image" src="https://github.com/user-attachments/assets/b44a5551-e035-4032-9184-839e97a9c080" />
+
+
+TIM1 PWM configuration
+
+8. TIM1->PSC = 84 - 1; // Timer clock assumed around 84 MHz. PSC = 83 gives 1 MHz timer frequency, 1 tick = 1 microsecond.
+
+
+9. TIM1->ARR = 20000 - 1; // Servo needs 50 Hz: Period = 20 ms = 20000 us.
+
+
+11. // PWM mode 1 on channel 1
+    TIM1->CCMR1 &= ~(0x7 << 4);
+    TIM1->CCMR1 |=  (0x6 << 4);
+      
