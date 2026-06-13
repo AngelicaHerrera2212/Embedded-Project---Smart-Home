@@ -68,6 +68,9 @@ CCR1 = 2000 / 2000 µs = 2 ms
 2. RCC->APB2ENR |= (0x1 << 0); // Enable TIM1 clock. Session 6.3.14 - RCC APB2 peripheral clock enable register (RCC_APB2ENR). Select bit 0 from APB2ENR that is TIM1, then use OR bitwise compares to turn specifically this bit on (it turns ON the bit without affecting other bits), finally set the bit to 1.
 
  <img width="449" height="371" alt="image" src="https://github.com/user-attachments/assets/3dc47178-fcd8-46bc-a4dd-4ffc616388dd" />
+Datasheet reference:
+<img width="383" height="368" alt="image" src="https://github.com/user-attachments/assets/5e0b72ed-2a1c-419b-9691-c0de6437e629" />
+<img width="622" height="394" alt="image" src="https://github.com/user-attachments/assets/bba4748c-40ee-40bd-a95b-1eafa6fc4a3a" />
 
 3. GPIOA->MODER &= ~(0x03 << 16); // Clear bits [17:16] - Apply Mask and force to 0.
 GPIOA->MODER |=  (0x02 << 16); // Set PA8 as OUTPUT - OR.
@@ -105,20 +108,37 @@ GPIOA->AFR[1] |=  (0x01 << 0); Set the function, 0x01 = 0001, goes into bits [3:
 
 <img width="471" height="267" alt="image" src="https://github.com/user-attachments/assets/f2bc03e3-2e9b-49b0-87a1-5021a2537489" />
 
-7. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down:
+7. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down: The instruction disables both pull-up and pull-down resistors on pin PA8, leaving it in a floating state (unless externally driven).
 
 <img width="461" height="273" alt="image" src="https://github.com/user-attachments/assets/b44a5551-e035-4032-9184-839e97a9c080" />
-
 
 TIM1 PWM configuration
 
 8. TIM1->PSC = 84 - 1; // Timer clock assumed around 84 MHz. PSC = 83 gives 1 MHz timer frequency, 1 tick = 1 microsecond.
-
+- <img width="221" height="52" alt="image" src="https://github.com/user-attachments/assets/cae3da96-3ea0-4c03-b154-0faebb799b71" />
+- <img width="348" height="52" alt="image" src="https://github.com/user-attachments/assets/99056aeb-4836-42f1-8eed-411122e5a3f1" />
+- <img width="293" height="122" alt="image" src="https://github.com/user-attachments/assets/bd306027-95b6-40fd-ac11-c85b72dacb6a" />
 
 9. TIM1->ARR = 20000 - 1; // Servo needs 50 Hz: Period = 20 ms = 20000 us.
+- <img width="221" height="34" alt="image" src="https://github.com/user-attachments/assets/2ddbfce3-3711-4562-9ee4-09af4083b579" />
+- <img width="262" height="74" alt="image" src="https://github.com/user-attachments/assets/b8e963da-fc8f-40c9-8707-07a71384cede" />
+- <img width="157" height="41" alt="image" src="https://github.com/user-attachments/assets/eb82e699-7e85-4045-b8c5-c388700ce60b" />
 
+10. // PWM mode 1 on channel 1
+CCMR1: It controls how channel 1 and channel 2 of the timer behave.
+<img width="490" height="356" alt="image" src="https://github.com/user-attachments/assets/909bdb39-66b2-4b54-a53c-1efa6a69db00" />
 
-11. // PWM mode 1 on channel 1
-    TIM1->CCMR1 &= ~(0x7 << 4);
-    TIM1->CCMR1 |=  (0x6 << 4);
+TIM1->CCMR1 &= ~(0x7 << 4); For channel 1, the important bits are: Bits [6:4] → OC1M (Output Compare Mode)
+- (0x7 << 4) → 0b1110000
+- ~(0x7 << 4) → invert → clears bits 6, 5, 4
+- &= applies the mask
+
+Result: Bits 6, 5, 4 are set to 0, all other bits stay unchanged.
+
+TIM1->CCMR1 |=  (0x6 << 4); Set PWM Mode 1. Output is: HIGH when counter < CCR1, LOW when counter ≥ CCR1.
+- 0x6 = 0b110
+- Shift left by 4
+- |= sets those bits
+- <img width="283" height="83" alt="image" src="https://github.com/user-attachments/assets/f51e6d74-8aaa-486e-8233-74b13aa1807c" />
+- <img width="400" height="253" alt="image" src="https://github.com/user-attachments/assets/dc3b041b-d6ed-4e03-ba67-b6db03225eec" />
       
