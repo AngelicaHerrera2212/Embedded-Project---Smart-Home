@@ -7,6 +7,8 @@ To connect the servo motor, we used the diagrams below.
 
 Servo for Door Control Code Description.
 
+----SET UP----
+
 - #define SERVO_CLOSED_ANGLE   0 / #define SERVO_OPEN_ANGLE     90
 
 These are just labels (names) for angles, in as this angles will be used for the door control we can modify the variables values depending on the physical performance.
@@ -68,7 +70,9 @@ CCR1 = 2000 / 2000 µs = 2 ms
 2. RCC->APB2ENR |= (0x1 << 0); // Enable TIM1 clock. Session 6.3.14 - RCC APB2 peripheral clock enable register (RCC_APB2ENR). Select bit 0 from APB2ENR that is TIM1, then use OR bitwise compares to turn specifically this bit on (it turns ON the bit without affecting other bits), finally set the bit to 1.
 
  <img width="449" height="371" alt="image" src="https://github.com/user-attachments/assets/3dc47178-fcd8-46bc-a4dd-4ffc616388dd" />
+ 
 Datasheet reference:
+
 <img width="383" height="368" alt="image" src="https://github.com/user-attachments/assets/5e0b72ed-2a1c-419b-9691-c0de6437e629" />
 <img width="622" height="394" alt="image" src="https://github.com/user-attachments/assets/bba4748c-40ee-40bd-a95b-1eafa6fc4a3a" />
 
@@ -118,11 +122,14 @@ TIM1 PWM configuration
 - <img width="221" height="52" alt="image" src="https://github.com/user-attachments/assets/cae3da96-3ea0-4c03-b154-0faebb799b71" />
 - <img width="348" height="52" alt="image" src="https://github.com/user-attachments/assets/99056aeb-4836-42f1-8eed-411122e5a3f1" />
 - <img width="293" height="122" alt="image" src="https://github.com/user-attachments/assets/bd306027-95b6-40fd-ac11-c85b72dacb6a" />
+-<img width="446" height="166" alt="image" src="https://github.com/user-attachments/assets/507e9d5d-423b-4644-acca-1b4a3a5a63bb" />
+
 
 9. TIM1->ARR = 20000 - 1; // Servo needs 50 Hz: Period = 20 ms = 20000 us.
 - <img width="221" height="34" alt="image" src="https://github.com/user-attachments/assets/2ddbfce3-3711-4562-9ee4-09af4083b579" />
 - <img width="262" height="74" alt="image" src="https://github.com/user-attachments/assets/b8e963da-fc8f-40c9-8707-07a71384cede" />
 - <img width="157" height="41" alt="image" src="https://github.com/user-attachments/assets/eb82e699-7e85-4045-b8c5-c388700ce60b" />
+- <img width="452" height="162" alt="image" src="https://github.com/user-attachments/assets/a8140d29-9b4c-4146-b93a-6b36715144ed" />
 
 10. // PWM mode 1 on channel 1
 CCMR1: It controls how channel 1 and channel 2 of the timer behave.
@@ -142,3 +149,50 @@ TIM1->CCMR1 |=  (0x6 << 4); Set PWM Mode 1. Output is: HIGH when counter < CCR1,
 - <img width="283" height="83" alt="image" src="https://github.com/user-attachments/assets/f51e6d74-8aaa-486e-8233-74b13aa1807c" />
 - <img width="400" height="253" alt="image" src="https://github.com/user-attachments/assets/dc3b041b-d6ed-4e03-ba67-b6db03225eec" />
       
+11. TIM1->CCMR1 |= (0x1 << 3); // Enable preload: It means the value you write to CCR1 is not applied immediately. Instead, it is stored in a shadow register and it only takes effect at the next timer update event (when counter resets). Without preload the PWM signal might glitch if you update CCR1 in the middle of a cycle.
+
+<img width="380" height="83" alt="image" src="https://github.com/user-attachments/assets/9ab4a188-1ea9-4d64-9610-674aa65aaae6" />
+
+12. TIM1->CCER |= (0x1 << 0); // Enable channel 1 output: Controls whether each channel output is actually sent to the pin. Without this, the timer runs, PWM is generated internally but nothing appears on the pin.
+
+<img width="383" height="90" alt="image" src="https://github.com/user-attachments/assets/ee25485d-09d8-4b1c-9df6-09bb434dad79" />
+
+13. TIM1->BDTR |= (0x1 << 15); // TIM1 is advanced-control timer, so Main Output Enable is required: Bit 15 is MOE (Main Output Enable). What does MOE do? Even if PWM mode is configured and channel is enabled, The output is still blocked unless MOE = 1
+
+<img width="459" height="143" alt="image" src="https://github.com/user-attachments/assets/3576c7e6-14df-4c4e-a891-48ada0648561" />
+<img width="392" height="100" alt="image" src="https://github.com/user-attachments/assets/b003a812-072c-4711-aa43-f1642424aedd" />
+
+14. TIM1->CR1 |= (0x1 << 7); // Enable auto-reload preload: CR1 = Control Register 1, it controls the main behavior of the timer. New ARR value is stored in a shadow register. It only takes effect at the next update event (counter reset).
+
+<img width="457" height="114" alt="image" src="https://github.com/user-attachments/assets/c53ad140-77a3-424f-a09f-0a10cc37d9d8" />
+<img width="175" height="42" alt="image" src="https://github.com/user-attachments/assets/85ebb282-7a4f-4d68-adae-23483ab42391" />
+
+16. TIM1->CR1 |= (0x1 << 0); // Start timer
+
+<img width="376" height="72" alt="image" src="https://github.com/user-attachments/assets/17ccf6ac-8907-47f4-9228-0eff24b24a00" />
+
+
+
+----FUNCTIONS----
+
+- void Servo_SetAngle(uint8_t angle): Takes an angle (0–180°) as input, converts it into a PWM pulse width and sends it to the servo via TIM1.
+<img width="206" height="92" alt="image" src="https://github.com/user-attachments/assets/ce19054d-6b7b-4c11-a266-e18f1c1075ae" />
+
+This part is to make sure only angles from 0 to 180 apply to the logic, for safety.
+
+- if (angle > 180)
+{
+    angle = 180;
+}
+
+This part converts the angle to pulse width: Remember max pulse is 2000 and min pulse is 1000, Range = 2500 − 500 = 2000 µs.
+Multiply angle by that range, this scales the angle across the full pulse range, Then divide by 180, to normalize the value to the 0–180° range. Finally add the min pulse, Shifts range to start at 1000 µs.
+
+- uint32_t pulse_us =
+    SERVO_MIN_PULSE_US +
+    ((uint32_t)angle * (SERVO_MAX_PULSE_US - SERVO_MIN_PULSE_US)) / 180;
+
+This part send pulse width to the timer. Keep the signal HIGH for pulse_us microseconds. Earlier we configured Timer frequency = 1 MHz, so 1 tick = 1 µs.
+
+- TIM1->CCR1 = pulse_us;
+    
