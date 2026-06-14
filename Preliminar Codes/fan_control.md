@@ -37,4 +37,11 @@ Note:
 
 <img width="434" height="224" alt="image" src="https://github.com/user-attachments/assets/0cbc2c76-a5c5-4e78-8054-2f18b49f41f3" />
 
+FanControl_Init(void):
 
+- RCC->AHB1ENR |= (0x1 << 1); // Enable GPIOB clock
+
+<img width="331" height="125" alt="image" src="https://github.com/user-attachments/assets/16acf32a-ed42-4f66-89cb-8bc9147cabe9" />
+
+
+    
