@@ -12,11 +12,29 @@ Fan Control Code Description
 <img width="99" height="34" alt="image" src="https://github.com/user-attachments/assets/8c4a8de1-0f6a-4840-ba14-26cdb567317e" />
 <img width="146" height="72" alt="image" src="https://github.com/user-attachments/assets/254334ee-d3c1-4ad3-a78c-47de4cb0e489" />
 
-- #define FAN_DEADBAND 0.5f // Ignore small errors: 
+- #define FAN_DEADBAND 0.5f // Ignore small errors: If the temperature error is smaller than ±0.5°C, the controller ignores it and outputs zero.
 
-- #define FAN_MIN_PWM 30 // Minimum PWM to start fan: 
+- #define FAN_MIN_PWM 30 // Minimum PWM to start fan: DC fans do not start spinning at very low duty cycles (e.g., 5–20%).
+They need a “kick” to overcome static friction.
 
-- #define FAN_MAX_PWM 100 // Maximum PWM:
+- #define FAN_MAX_PWM 100 // Maximum PWM: This caps the fan speed at 100% duty cycle.
 
-- #define DHT_READ_PERIOD_MS 2000 // DHT should not be read too fast: 
+- #define DHT_READ_PERIOD_MS 2000 // DHT should not be read too fast: The DHT11 temperature–humidity sensors cannot be polled too frequently. They require ~2 seconds between reads.
+
+- #define FAN_PWM_INVERTED 0 // FAN DRIVER TYPE: With a 2N2222 transistor when the PWM pin goes HIGH, current flows into the base, transistor turns ON, fan gets ground and fan spins.
+
+Note:
+0 = normal MOSFET / transistor driver, PWM HIGH = fan ON
+1 = inverted driver, PWM LOW = fan ON
+
+- static float current_temperature = 0.0f; This variable stores the latest measured temperature from the DHT sensor. static means persists across function calls. Initialized to 0.0 until the first sensor read.
+
+- static float current_humidity = 0.0f; This variable stores the latest humidity reading from the DHT sensor.
+
+- static uint8_t fan_pwm_percent = 0; This variable stores the current PWM duty cycle being applied to the fan, expressed in percent (0–100). uint8_t → 8‑bit integer (0–255), perfect for 0–100%.
+
+- static uint32_t last_dht_read_time = 0; This stores the timestamp (in ms) of the last successful DHT read.
+
+<img width="434" height="224" alt="image" src="https://github.com/user-attachments/assets/0cbc2c76-a5c5-4e78-8054-2f18b49f41f3" />
+
 
