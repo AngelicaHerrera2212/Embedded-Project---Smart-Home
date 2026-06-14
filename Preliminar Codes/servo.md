@@ -77,7 +77,7 @@ Datasheet reference:
 <img width="622" height="394" alt="image" src="https://github.com/user-attachments/assets/bba4748c-40ee-40bd-a95b-1eafa6fc4a3a" />
 
 3. GPIOA->MODER &= ~(0x03 << 16); // Clear bits [17:16] - Apply Mask and force to 0.
-GPIOA->MODER |=  (0x02 << 16); // Set PA8 as OUTPUT - OR.
+GPIOA->MODER |=  (0x02 << 16); // Set PA8 as Alternate Funcion (0010 - 0x02) - OR.
 
 <img width="440" height="277" alt="image" src="https://github.com/user-attachments/assets/72e0bbfd-e0c7-4181-8294-38713c6e017b" />
 
