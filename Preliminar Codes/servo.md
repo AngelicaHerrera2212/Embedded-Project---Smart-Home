@@ -110,28 +110,24 @@ GPIOA->AFR[1] |=  (0x01 << 0); Set the function, 0x01 = 0001, goes into bits [3:
 
 6. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down: The instruction disables both pull-up and pull-down resistors on pin PA8, leaving it in a floating state (unless externally driven).
 
-<img width="471" height="267" alt="image" src="https://github.com/user-attachments/assets/f2bc03e3-2e9b-49b0-87a1-5021a2537489" />
-
-7. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down: The instruction disables both pull-up and pull-down resistors on pin PA8, leaving it in a floating state (unless externally driven).
-
 <img width="461" height="273" alt="image" src="https://github.com/user-attachments/assets/b44a5551-e035-4032-9184-839e97a9c080" />
 
 TIM1 PWM configuration
 
-8. TIM1->PSC = 84 - 1; // Timer clock assumed around 84 MHz. PSC = 83 gives 1 MHz timer frequency, 1 tick = 1 microsecond.
+7. TIM1->PSC = 84 - 1; // Timer clock assumed around 84 MHz. PSC = 83 gives 1 MHz timer frequency, 1 tick = 1 microsecond.
 - <img width="221" height="52" alt="image" src="https://github.com/user-attachments/assets/cae3da96-3ea0-4c03-b154-0faebb799b71" />
 - <img width="348" height="52" alt="image" src="https://github.com/user-attachments/assets/99056aeb-4836-42f1-8eed-411122e5a3f1" />
 - <img width="293" height="122" alt="image" src="https://github.com/user-attachments/assets/bd306027-95b6-40fd-ac11-c85b72dacb6a" />
 -<img width="446" height="166" alt="image" src="https://github.com/user-attachments/assets/507e9d5d-423b-4644-acca-1b4a3a5a63bb" />
 
 
-9. TIM1->ARR = 20000 - 1; // Servo needs 50 Hz: Period = 20 ms = 20000 us.
+8. TIM1->ARR = 20000 - 1; // Servo needs 50 Hz: Period = 20 ms = 20000 us.
 - <img width="221" height="34" alt="image" src="https://github.com/user-attachments/assets/2ddbfce3-3711-4562-9ee4-09af4083b579" />
 - <img width="262" height="74" alt="image" src="https://github.com/user-attachments/assets/b8e963da-fc8f-40c9-8707-07a71384cede" />
 - <img width="157" height="41" alt="image" src="https://github.com/user-attachments/assets/eb82e699-7e85-4045-b8c5-c388700ce60b" />
 - <img width="452" height="162" alt="image" src="https://github.com/user-attachments/assets/a8140d29-9b4c-4146-b93a-6b36715144ed" />
 
-10. // PWM mode 1 on channel 1
+9. // PWM mode 1 on channel 1
 CCMR1: It controls how channel 1 and channel 2 of the timer behave.
 <img width="490" height="356" alt="image" src="https://github.com/user-attachments/assets/909bdb39-66b2-4b54-a53c-1efa6a69db00" />
 
@@ -149,25 +145,25 @@ TIM1->CCMR1 |=  (0x6 << 4); Set PWM Mode 1. Output is: HIGH when counter < CCR1,
 - <img width="283" height="83" alt="image" src="https://github.com/user-attachments/assets/f51e6d74-8aaa-486e-8233-74b13aa1807c" />
 - <img width="400" height="253" alt="image" src="https://github.com/user-attachments/assets/dc3b041b-d6ed-4e03-ba67-b6db03225eec" />
       
-11. TIM1->CCMR1 |= (0x1 << 3); // Enable preload: It means the value you write to CCR1 is not applied immediately. Instead, it is stored in a shadow register and it only takes effect at the next timer update event (when counter resets). Without preload the PWM signal might glitch if you update CCR1 in the middle of a cycle.
+10. TIM1->CCMR1 |= (0x1 << 3); // Enable preload: It means the value you write to CCR1 is not applied immediately. Instead, it is stored in a shadow register and it only takes effect at the next timer update event (when counter resets). Without preload the PWM signal might glitch if you update CCR1 in the middle of a cycle.
 
 <img width="380" height="83" alt="image" src="https://github.com/user-attachments/assets/9ab4a188-1ea9-4d64-9610-674aa65aaae6" />
 
-12. TIM1->CCER |= (0x1 << 0); // Enable channel 1 output: Controls whether each channel output is actually sent to the pin. Without this, the timer runs, PWM is generated internally but nothing appears on the pin.
+11. TIM1->CCER |= (0x1 << 0); // Enable channel 1 output: Controls whether each channel output is actually sent to the pin. Without this, the timer runs, PWM is generated internally but nothing appears on the pin.
 
 <img width="383" height="90" alt="image" src="https://github.com/user-attachments/assets/ee25485d-09d8-4b1c-9df6-09bb434dad79" />
 
-13. TIM1->BDTR |= (0x1 << 15); // TIM1 is advanced-control timer, so Main Output Enable is required: Bit 15 is MOE (Main Output Enable). What does MOE do? Even if PWM mode is configured and channel is enabled, The output is still blocked unless MOE = 1
+12. TIM1->BDTR |= (0x1 << 15); // TIM1 is advanced-control timer, so Main Output Enable is required: Bit 15 is MOE (Main Output Enable). What does MOE do? Even if PWM mode is configured and channel is enabled, The output is still blocked unless MOE = 1
 
 <img width="459" height="143" alt="image" src="https://github.com/user-attachments/assets/3576c7e6-14df-4c4e-a891-48ada0648561" />
 <img width="392" height="100" alt="image" src="https://github.com/user-attachments/assets/b003a812-072c-4711-aa43-f1642424aedd" />
 
-14. TIM1->CR1 |= (0x1 << 7); // Enable auto-reload preload: CR1 = Control Register 1, it controls the main behavior of the timer. New ARR value is stored in a shadow register. It only takes effect at the next update event (counter reset).
+13. TIM1->CR1 |= (0x1 << 7); // Enable auto-reload preload: CR1 = Control Register 1, it controls the main behavior of the timer. New ARR value is stored in a shadow register. It only takes effect at the next update event (counter reset).
 
 <img width="457" height="114" alt="image" src="https://github.com/user-attachments/assets/c53ad140-77a3-424f-a09f-0a10cc37d9d8" />
 <img width="175" height="42" alt="image" src="https://github.com/user-attachments/assets/85ebb282-7a4f-4d68-adae-23483ab42391" />
 
-16. TIM1->CR1 |= (0x1 << 0); // Start timer
+14. TIM1->CR1 |= (0x1 << 0); // Start timer
 
 <img width="376" height="72" alt="image" src="https://github.com/user-attachments/assets/17ccf6ac-8907-47f4-9228-0eff24b24a00" />
 
