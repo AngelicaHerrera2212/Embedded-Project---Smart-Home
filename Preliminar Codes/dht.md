@@ -72,7 +72,7 @@ Sets the global TRCENA bit (Bit 24) inside the processor's DEMCR register. This 
 
 DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 Asserts the explicit cycle counter activation flag inside the DWT control layout, prompting the hardware cycle register (DWT->CYCCNT) to begin incrementing actively.
----
+```c
 
 <p align="center">
   <img width="425" height="331" alt="image" src="https://github.com/user-attachments/assets/e9c65b3b-f3d7-4406-b8d6-77d8de81e0da" />
