@@ -33,6 +33,11 @@ The hardware register boundaries and signal pins are explicitly mapped as follow
 
 ### 1. High-Resolution Microsecond Delay (`delay_us`)
 
+
+<p align="center">
+  <img width="425" height="331" alt="image" src="https://github.com/user-attachments/assets/e9c65b3b-f3d7-4406-b8d6-77d8de81e0da" />
+</p>
+
 ```c
 static void delay_us(uint32_t us)
 This function creates a blocking hardware delay measured in microseconds (µs). Precision timing is critical for the DHT11 single-wire protocol, which communicates using transient signal windows (e.g., 20–40 µs LOW pulses followed by 70 µs HIGH pulses). The native HAL_Delay() utility is millisecond-based and entirely inadequate for these demanding timing constraints.
@@ -72,8 +77,3 @@ Sets the global TRCENA bit (Bit 24) inside the processor's DEMCR register. This 
 
 DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 Asserts the explicit cycle counter activation flag inside the DWT control layout, prompting the hardware cycle register (DWT->CYCCNT) to begin incrementing actively.
-```c
-
-<p align="center">
-  <img width="425" height="331" alt="image" src="https://github.com/user-attachments/assets/e9c65b3b-f3d7-4406-b8d6-77d8de81e0da" />
-</p>
