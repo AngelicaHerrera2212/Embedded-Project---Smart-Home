@@ -143,7 +143,7 @@ Shift left by 4
 - TIM4->CR1 |= (0x1 << 7); // Enable auto-reload preload: Enable auto-reload preload: CR1 = Control Register 1, it controls the main behavior of the timer. New ARR value is stored in a shadow register. It only takes effect at the next update event (counter reset).
 
 <img width="334" height="80" alt="image" src="https://github.com/user-attachments/assets/ca3a48dd-a4a7-4620-8aea-d14459b1ae9a" />
-<img width="129" height="27" alt="image" src="https://github.com/user-attachments/assets/d32c156e-7268-487b-b199-79ea1fab989a" />
+<img width="129*0.5" height="27*0.5" alt="image" src="https://github.com/user-attachments/assets/d32c156e-7268-487b-b199-79ea1fab989a" />
 
 
 - TIM4->EGR |= (0x1 << 0); // Generate update event: Event Generation Register. It forces the timer to immediately reload the PSC and ARR values you just configured, instead of waiting for the next timer overflow.
@@ -152,13 +152,88 @@ Shift left by 4
 <img width="375" height="79" alt="image" src="https://github.com/user-attachments/assets/11e143e0-6697-4d2d-9460-68aff6c9ad37" />
 
 - TIM4->CR1 |= (0x1 << 0); // Enable timer
-<img width="280" height="49" alt="image" src="https://github.com/user-attachments/assets/a242fcf8-4ac9-4feb-a04a-bc7cd675625d" />
+<img width="280*0.3" height="49*0.3" alt="image" src="https://github.com/user-attachments/assets/a242fcf8-4ac9-4feb-a04a-bc7cd675625d" />
 
+---- Functions ---- 
 
+- static void Fan_SetPWM(uint8_t duty_percent): set the fan PWM duty cycle in percent (0–100) and translate that into the correct CCR1 value for TIM4 channel 1.
 
-    
-        
-    
+This part ensures you never exceed 100%
 
+- if (duty_percent > 100)
+    {
+        duty_percent = 100;
+    }
 
+This part store the current duty for later use.
 
+- fan_pwm_percent = duty_percent;
+
+This part is compiled when #define FAN_PWM_INVERTED 0, which is our case the 2N2222.
+
+- TIM4->CCR1 = (duty_percent * (TIM4->ARR + 1)) / 100;
+
+Step by step: TIM4-> ARR = 999 → ARR + 1 = 1000 counts.
+
+duty_percent * (ARR + 1). Example: 25% → 25 * 1000 = 25000. Divide by 100 to get the compare value: 25000 / 100 = 250.
+
+This gives:
+0% → CCR1 = 0
+50% → CCR1 = 500
+100% → CCR1 = 1000 (or 999 depending on rounding)
+
+- void FanControl_Update(void): 
+
+This part returns the system time in milliseconds, now is the current timestamp used to decide if it’s time to read the DHT sensor again.
+
+- uint32_t now = HAL_GetTick();
+
+This part computes how long it’s been since the last DHT read: now - last_dht_read_time. If this elapsed time is less than DHT_READ_PERIOD_MS (2000 ms), the function exits immediately. This means: “Too soon to read the sensor again, do nothing this cycle.” If enough time has passed, we continue.
+
+- if ((now - last_dht_read_time) < DHT_READ_PERIOD_MS)
+    {
+        return;
+    }
+
+This part records that we’re about to perform a new DHT read at time now. Next call will measure time from this moment.
+
+- last_dht_read_time = now;
+
+The last part function is: DHT_Read(...) attempts to read the sensor. On success (returns non‑zero/true): It updates current_temperature and current_humidity. Then we compute the control action. On failure: For safety, the fan is turned OFF: Fan_SetPWM(0);.
+
+1. Compute temperature error. error = measured temperature − target temperature. If current_temperature > target → error > 0 → we need cooling. If current_temperature ≤ target → error ≤ 0 → no need to cool, pwm_value will hold the fan speed in percent (0–100). 
+
+- float error = current_temperature - FAN_TARGET_TEMP;
+- float pwm_value = 0.0f;
+
+2. Apply deadband. If the error is less than or equal to the deadband (e.g. 0.5°C), the fan is kept OFF. This avoids fan activity for tiny temperature deviations and sensor noise.
+
+3. Proportional control when error is significant. When error > FAN_DEADBAND, we compute a proportional control. Larger temperature difference → higher PWM → faster fan.
+
+- pwm_value = FAN_KP * error;
+
+4. Enforce minimum PWM. If the computed PWM is too small (below the minimum needed to reliably start the fan), it is raised to FAN_MIN_PWM (e.g. 30%). This avoids the fan stalling or buzzing at very low duty cycles.
+
+- if (pwm_value < FAN_MIN_PWM)
+{
+    pwm_value = FAN_MIN_PWM;
+}
+
+5. Enforce maximum PWM. Caps the PWM at FAN_MAX_PWM (e.g. 100%). Protects the fan and ensures the duty cycle stays within valid bounds.
+
+- if (pwm_value > FAN_MAX_PWM)
+{
+    pwm_value = FAN_MAX_PWM;
+}
+
+6. Apply the PWM to the hardware. Converts the float pwm_value to an 8‑bit integer (0–100). Calls Fan_SetPWM, which: stores fan_pwm_percent, converts the percentage into a CCR1 value using ARR, updates the timer’s PWM output.
+
+- Fan_SetPWM((uint8_t)pwm_value);
+
+7. Sensor failure branch. If the DHT read fails, the system does not trust the temperature. As a safety measure, it turns the fan OFF instead of running it blindly.
+
+- else
+{
+    // If DHT reading fails, turn fan OFF for safety.
+    Fan_SetPWM(0);
+}
