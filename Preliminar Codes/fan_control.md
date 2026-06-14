@@ -39,9 +39,16 @@ Note:
 
 FanControl_Init(void):
 
-- RCC->AHB1ENR |= (0x1 << 1); // Enable GPIOB clock
+- RCC->AHB1ENR |= (0x1 << 1); // Enable GPIOB clock: RCC AHB1 peripheral clock enable register (RCC_AHB1ENR) RCC = Reset and Clock Control. Select bit 1 from AHB1ENR that is GPIOB, then use OR bitwise compares to turn specifically this bit on (it turns ON the bit without affecting other bits), finally set the bit to 1.
 
 <img width="331" height="125" alt="image" src="https://github.com/user-attachments/assets/16acf32a-ed42-4f66-89cb-8bc9147cabe9" />
 
+- RCC->APB1ENR |= (0x1 << 2); // Enable TIM4 clock: RCC APB2 peripheral clock enable register (RCC_APB1ENR). Select bit 2 from APB1ENR that is TIM4, then use OR bitwise compares to turn specifically this bit on (it turns ON the bit without affecting other bits), finally set the bit to 1.
 
-    
+<img width="448" height="178" alt="image" src="https://github.com/user-attachments/assets/b7b651d2-9e2e-4791-a67e-7d96407770f3" />
+
+- GPIOB->MODER &= ~(0x03 << 12); // Clear bits [13:12] - Apply Mask and force to 0. GPIOB->MODER |=  (0x02 << 12); // Set PA8 as Alternate Function - OR.    
+
+<img width="461" height="280" alt="image" src="https://github.com/user-attachments/assets/6b39da4d-607a-4551-8585-f35383ef5682" />
+
+
