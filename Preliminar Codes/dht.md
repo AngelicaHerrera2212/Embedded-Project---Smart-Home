@@ -61,10 +61,6 @@ CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 DWT->CTRL        |= DWT_CTRL_CYCCNTENA_Msk; // ENABLE DWT COUNTER
 To leverage the high-resolution hardware cycle counter, the developer must explicitly enable and power up the internal CPU debug, tracing, and watchpoint macrocells inside the ARM Cortex-M architecture.
 
-<p align="center">
-  <img width="425" height="331" alt="image" src="https://github.com/user-attachments/assets/e9c65b3b-f3d7-4406-b8d6-77d8de81e0da" />
-</p>
-
 C
 /* * DEMCR: Debug Exception and Monitor Control Register
  * TRCENA: Global Trace Enable Bit
@@ -76,3 +72,8 @@ Sets the global TRCENA bit (Bit 24) inside the processor's DEMCR register. This 
 
 DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 Asserts the explicit cycle counter activation flag inside the DWT control layout, prompting the hardware cycle register (DWT->CYCCNT) to begin incrementing actively.
+---
+
+<p align="center">
+  <img width="425" height="331" alt="image" src="https://github.com/user-attachments/assets/e9c65b3b-f3d7-4406-b8d6-77d8de81e0da" />
+</p>
