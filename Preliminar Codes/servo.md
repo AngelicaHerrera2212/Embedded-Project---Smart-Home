@@ -108,7 +108,7 @@ GPIOA->AFR[1] |=  (0x01 << 0); Set the function, 0x01 = 0001, goes into bits [3:
 
 <img width="471" height="236" alt="image" src="https://github.com/user-attachments/assets/4c2d9fa6-e7d5-425c-921a-aa78d646f418" />
 
-6. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down: The instruction disables both pull-up and pull-down resistors on pin PB10, leaving it in a floating state (unless externally driven).
+6. GPIOA->PUPDR  &= ~(0x03 << 16); // No pull-up/down: The instruction disables both pull-up and pull-down resistors on pin PA8, leaving it in a floating state (unless externally driven).
 
 <img width="471" height="267" alt="image" src="https://github.com/user-attachments/assets/f2bc03e3-2e9b-49b0-87a1-5021a2537489" />
 
