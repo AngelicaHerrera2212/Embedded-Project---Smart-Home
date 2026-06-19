@@ -22,13 +22,87 @@
 #include "dht.h"
 #include "pir.h"
 #include "leds.h"
+#include "servo.h"
+#include "fan_control.h"
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-/* Global sensor variables */
+// Global sensor variables
 float temperature = 0.0f;
 float humidity = 0.0f;
+static float current_temperature = 0.0f;
+static float current_humidity = 0.0f;
+uint8_t fan_pwm_percent = 0;
+// PID state
+static float pid_integral = 0.0f;
+static float previous_error = 0.0f;
+
+// UART Communication variables
+
+/* Stores the last byte received from ESP8266. UART interrupt receives one byte
+at a time. */
+uint8_t rx_byte;
+// Temporary buffer used to store incoming characters.
+char rx_buffer[64];
+// Stores the complete command after '\n' is received. Example:command = "LIGHT:ON"
+char command[64];
+
+// Current position inside rx_buffer. Increases every time a new character arrives.
+uint8_t rx_index = 0;
+/* Flag set by UART interrupt.
+* 0 -> no complete command available
+* 1 -> command ready to be processed */
+volatile uint8_t command_ready = 0;
+
+// Access Control
+
+/* Counts consecutive wrong password attempts.
+If wrong_attempts reaches 4: activate buzzer alarm */
+uint8_t wrong_attempts = 0;
+/* Master password used to open the door. */
+char correct_password[] = "1234";
+
+// Lighting Control Variables
+
+/* Lighting operating mode.
+* 1 -> AUTO mode: PIR controls LEDs
+* 0 -> MANUAL mode: App controls LEDs */
+uint8_t light_auto_mode = 1;
+/* Desired LED state in MANUAL mode.
+* 1 -> LEDs ON
+* 0 -> LEDs OFF */
+uint8_t manual_light_state = 0;
+
+// System Status Variables
+
+/* Current door state.
+* 1 -> OPEN
+* 0 -> CLOSED */
+uint8_t door_open = 0;
+/* Alarm state.
+* 1 -> alarm active
+* 0 -> alarm inactive */
+uint8_t alarm_active = 0;
+/* Motion detection status. Updated by PIR module.
+* 1 -> motion detected
+* 0 -> no motion */
+uint8_t motion_detected = 0;
+
+// Periodic Task Timers
+
+/* Timestamp of last status transmission.
+* Used to send system status every few seconds
+* without blocking the processor. */
+uint32_t last_status_time = 0;
+/* Timestamp of last PIR evaluation.
+* Used to periodically check motion detection
+* without using HAL_Delay(). */
+uint32_t last_pir_time = 0;
 
 /* USER CODE END Includes */
 
@@ -49,6 +123,7 @@ float humidity = 0.0f;
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 
@@ -57,8 +132,12 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
+
+void Process_Command(void);
+void Send_Status(void);
 
 /* USER CODE END PFP */
 
@@ -96,6 +175,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   /* Initialize external modules */
@@ -103,19 +183,33 @@ int main(void)
   DHT_Init();      // PC1 = DHT11/DHT22 data pin
   PIR_Init();	   // PC2 = PIR Sensor
   LEDs_Init();	   // PC3 = LED1, PC4 = LED2, PC5 = LED3, PB0 = LED4, PB1 = LED5
+  Servo_Init();    // PA8 = Servo Signal
+  Servo_CloseDoor();
+  door_open = 0;
+  FanControl_Init(); // PB6 = Fan PWM
+
+  /* Start UART interrupt reception. STM32 receives one byte at a time from ESP8266. */
+  HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN WHILE */
   /* Infinite loop */
   while (1)
   {
+	  //Servo_SetAngle(180);
+	  //HAL_Delay(1500);
+	  //Servo_SetAngle(0);
+	  //HAL_Delay(1500);
+	  //DHT_Read(&temperature, &humidity);
+	  // TESTING DHT, BUZZER, LEDS AND PIR
 	  /* CONDITIONS:
        * If: temperature > 22°C AND motion detected
        * THEN: turn ON all LEDs AND activate buzzer sounds
        */
-      if (DHT_Read(&temperature, &humidity))
+
+      /*if (DHT_Read(&temperature, &humidity))
       {
-          if ((temperature > 22.0f) && PIR_HardMovementDetected())
+          if ((temperature > 22.0f) && PIR_RawRead())
           {
               LEDs_On();
               Buzzer_AllSounds();
@@ -124,9 +218,78 @@ int main(void)
           {
               LEDs_Off();
           }
-     }
-     /* USER CODE BEGIN 3 */
-     HAL_Delay(2000);
+     }*/
+
+
+      // TESTING SERVO
+        /*Servo_SetAngle(0);
+        HAL_Delay(1500);
+
+        Servo_SetAngle(45);
+        HAL_Delay(1500);
+
+        Servo_SetAngle(90);
+        HAL_Delay(1500);
+
+        Servo_SetAngle(120);
+        HAL_Delay(1500);
+
+        Servo_SetAngle(180);
+        HAL_Delay(1500);*/
+
+
+      // TESTING FAN CONTROL
+        /*FanControl_Update();
+        HAL_Delay(100);*/
+
+	  // FINAL WHILE LOOP
+	     // 1. Process command received from ESP8266/app
+	     if (command_ready)
+	     {
+	         command_ready = 0;
+	         Process_Command();
+	     }
+	     // 2. Update DHT + fan PWM control
+	     FanControl_Update();
+	     // 3. Check PIR every 200 ms
+	     if (HAL_GetTick() - last_pir_time >= 200)
+	     {
+	         last_pir_time = HAL_GetTick();
+	         motion_detected = PIR_RawRead();
+	     }
+	     // 4. Update LEDs depending on mode
+	     if (light_auto_mode)
+	     {
+	         if (motion_detected)
+	         {
+	             LEDs_On();
+	         }
+	         else
+	         {
+	             LEDs_Off();
+	         }
+	     }
+	     else
+	     {
+	         if (manual_light_state)
+	         {
+	             LEDs_On();
+	         }
+	         else
+	         {
+	             LEDs_Off();
+	         }
+	     }
+	     // 5. Send status every 2 seconds
+	     /*if (HAL_GetTick() - last_status_time >= 2000)
+	     {
+	         last_status_time = HAL_GetTick();
+	         Send_Status();
+	     }*/
+
+
+     /* USER CODE BEGIN 3*/
+     HAL_Delay(10);
      /* USER CODE END 3 */
   }
   /* USER CODE BEGIN WHILE */
@@ -178,6 +341,40 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 }
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 9600;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
 
 /**
   * @brief USART2 Initialization Function
@@ -253,6 +450,143 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+
+{
+    if (huart->Instance == USART1)
+    {
+        if (rx_byte == '\n')
+        {
+            rx_buffer[rx_index] = '\0';
+            strcpy(command, rx_buffer);
+            rx_index = 0;
+            command_ready = 1;
+        }
+        else if (rx_byte != '\r')
+        {
+            if (rx_index < sizeof(rx_buffer) - 1)
+            {
+                rx_buffer[rx_index++] = rx_byte;
+            }
+        }
+        HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
+    }
+}
+
+void Process_Command(void)
+{
+   if (strncmp(command, "PASS:", 5) == 0)
+   {
+       char *received_password = command + 5;
+       if (strcmp(received_password, correct_password) == 0)
+       {
+           wrong_attempts = 0;
+           door_open = 1;
+           Servo_OpenDoor();
+           alarm_active = 0;
+           HAL_UART_Transmit(&huart1,
+                             (uint8_t*)"ACK:ACCESS_GRANTED\n",
+                             strlen("ACK:ACCESS_GRANTED\n"),
+                             100);
+       }
+       else
+       {
+           wrong_attempts++;
+           Buzzer_WrongPassword();
+           alarm_active = 1;
+           if (wrong_attempts >= 4)
+           {
+               alarm_active = 1;
+               Buzzer_Alarm();
+               wrong_attempts = 0;
+           }
+           HAL_UART_Transmit(&huart1,
+                             (uint8_t*)"ACK:ACCESS_DENIED\n",
+                             strlen("ACK:ACCESS_DENIED\n"),
+                             100);
+       }
+   }
+   else if (strcmp(command, "DOOR:CLOSE") == 0)
+   {
+       Servo_CloseDoor();
+       door_open = 0;
+       HAL_UART_Transmit(&huart1,
+                         (uint8_t*)"ACK:DOOR_CLOSED\n",
+                         strlen("ACK:DOOR_CLOSED\n"),
+                         100);
+   }
+   else if (strcmp(command, "LIGHT_MODE:AUTO") == 0)
+   {
+       light_auto_mode = 1;
+       HAL_UART_Transmit(&huart1,
+                         (uint8_t*)"ACK:LIGHT_AUTO\n",
+                         strlen("ACK:LIGHT_AUTO\n"),
+                         100);
+   }
+   else if (strcmp(command, "LIGHT_MODE:MANUAL") == 0)
+   {
+       light_auto_mode = 0;
+       HAL_UART_Transmit(&huart1,
+                         (uint8_t*)"ACK:LIGHT_MANUAL\n",
+                         strlen("ACK:LIGHT_MANUAL\n"),
+                         100);
+   }
+   else if (strcmp(command, "LIGHT:ON") == 0)
+   {
+       manual_light_state = 1;
+       if (!light_auto_mode)
+       {
+           LEDs_On();
+       }
+       HAL_UART_Transmit(&huart1,
+                         (uint8_t*)"ACK:LIGHT_ON\n",
+                         strlen("ACK:LIGHT_ON\n"),
+                         100);
+   }
+   else if (strcmp(command, "LIGHT:OFF") == 0)
+   {
+       manual_light_state = 0;
+       if (!light_auto_mode)
+       {
+           LEDs_Off();
+       }
+       HAL_UART_Transmit(&huart1,
+                         (uint8_t*)"ACK:LIGHT_OFF\n",
+                         strlen("ACK:LIGHT_OFF\n"),
+                         100);
+   }
+   else if (strcmp(command, "STATUS?") == 0)
+   {
+      Send_Status();
+   }
+   else
+   {
+       HAL_UART_Transmit(&huart1,
+                         (uint8_t*)"ERR:UNKNOWN_COMMAND\n",
+                         strlen("ERR:UNKNOWN_COMMAND\n"),
+                         100);
+   }
+}
+
+void Send_Status(void)
+{
+   char status_msg[120];
+   int temp = (int)FanControl_GetTemperature();
+   int hum  = (int)FanControl_GetHumidity();
+   int fan  = FanControl_GetPWM();
+   sprintf(status_msg,
+           "MOTION=%d,TEMP=%d,HUM=%d,LIGHT=%s,FAN=%d,ALARM=%d\n",
+           motion_detected,
+           temp,
+           hum,
+           manual_light_state ? "ON" : "OFF",
+           fan,
+           alarm_active);
+   HAL_UART_Transmit(&huart1,
+                     (uint8_t*)status_msg,
+                     strlen(status_msg),
+                     100);
+}
 /* USER CODE END 4 */
 
 /**
