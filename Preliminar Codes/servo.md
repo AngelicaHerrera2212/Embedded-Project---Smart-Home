@@ -9,7 +9,7 @@ Servo for Door Control Code Description.
 
 ----SET UP----
 
-- #define SERVO_CLOSED_ANGLE   0 / #define SERVO_OPEN_ANGLE     90
+- #define SERVO_CLOSED_ANGLE   180 / #define SERVO_OPEN_ANGLE     0
 
 These are just labels (names) for angles, in as this angles will be used for the door control we can modify the variables values depending on the physical performance.
 
