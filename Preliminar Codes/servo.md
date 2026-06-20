@@ -149,7 +149,7 @@ TIM1->CCMR1 |=  (0x6 << 4); Set PWM Mode 1. Output is: HIGH when counter < CCR1,
 
 <img width="380" height="83" alt="image" src="https://github.com/user-attachments/assets/9ab4a188-1ea9-4d64-9610-674aa65aaae6" />
 
-11. TIM1->CCER |= (0x1 << 0); // Enable channel 1 output: Controls whether each channel output is actually sent to the pin. Without this, the timer runs, PWM is generated internally but nothing appears on the pin.
+11. TIM1->CCER |= (0x1 << 0); // Capture/compare Enable Register: Enable channel 1 output: Controls whether each channel output is actually sent to the pin. Without this, the timer runs, PWM is generated internally but nothing appears on the pin.
 
 <img width="383" height="90" alt="image" src="https://github.com/user-attachments/assets/ee25485d-09d8-4b1c-9df6-09bb434dad79" />
 
