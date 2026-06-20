@@ -1,20 +1,32 @@
 # DC FAN - fan_control.c Description
 
+The STM32 pin sends a control signal into the transistor’s base, the transistor switches the fan’s ground on and off, and the external power supply feeds the fan while sharing ground with the STM32 so everything works together.
+
 <img width="536" height="374" alt="image" src="https://github.com/user-attachments/assets/33e3eb97-cfb1-441b-a8f4-380add812709" />
 
 <img width="1600" height="878" alt="WhatsApp Image 2026-06-20 at 10 13 36" src="https://github.com/user-attachments/assets/a0dcd133-130b-409e-a775-432e0d323d27" />
 
-
-
 Fan Control Code Description
+
+Declarations:
 
 - #define FAN_TARGET_TEMP 22.0f // Desired temperature in °C: Threshold
 
-- #define FAN_KP 25.0f // Proportional gain: It determines how strongly the fan reacts to temperature error.
+- #define FAN_KP 20.0f // Proportional gain: It determines how strongly the fan reacts to temperature error.
 
-<img width="152" height="34" alt="image" src="https://github.com/user-attachments/assets/a455905f-e712-48ea-bfdf-8868b98520d8" />
-<img width="99" height="34" alt="image" src="https://github.com/user-attachments/assets/8c4a8de1-0f6a-4840-ba14-26cdb567317e" />
-<img width="146" height="72" alt="image" src="https://github.com/user-attachments/assets/254334ee-d3c1-4ad3-a78c-47de4cb0e489" />
+<img width="77" height="37" alt="image" src="https://github.com/user-attachments/assets/b68eb8dc-2422-4687-abf6-0f5009c87578" />
+
+- #define FAN_KI 1.0f // Integral gain: reacts to accumulated error. Correct small errors that P can't eliminate.
+
+<img width="136" height="126" alt="image" src="https://github.com/user-attachments/assets/79338328-347f-4256-8c3d-bf38bb8926d1" />
+
+- #define FAN_KD 5.0f // Derivative gain: reacts to how fast error changes. If temperature increases fast it acts like brakes. Helps to make system more stable, less ocsilations.
+
+<img width="145" height="44" alt="image" src="https://github.com/user-attachments/assets/ab829184-a77c-4b3b-8c56-8df4de031a4c" />
+
+<img width="251" height="36" alt="image" src="https://github.com/user-attachments/assets/ecdcce36-3a89-406e-9d4f-2e6585998a74" />
+<img width="122" height="22" alt="image" src="https://github.com/user-attachments/assets/5f47e95a-0893-42de-afeb-aca81ac1840a" />
+
 
 - #define FAN_DEADBAND 0.5f // Ignore small errors: If the temperature error is smaller than ±0.5°C, the controller ignores it and outputs zero.
 
@@ -28,8 +40,10 @@ They need a “kick” to overcome static friction.
 - #define FAN_PWM_INVERTED 0 // FAN DRIVER TYPE: With a 2N2222 transistor when the PWM pin goes HIGH, current flows into the base, transistor turns ON, fan gets ground and fan spins.
 
 Note:
-0 = normal MOSFET / transistor driver, PWM HIGH = fan ON
+0 = normal MOSFET / transistor driver, PWM HIGH = fan ON. //
 1 = inverted driver, PWM LOW = fan ON
+
+Variables:
 
 - static float current_temperature = 0.0f; This variable stores the latest measured temperature from the DHT sensor. static means persists across function calls. Initialized to 0.0 until the first sensor read.
 
@@ -40,6 +54,16 @@ Note:
 - static uint32_t last_dht_read_time = 0; This stores the timestamp (in ms) of the last successful DHT read.
 
 <img width="434" height="224" alt="image" src="https://github.com/user-attachments/assets/0cbc2c76-a5c5-4e78-8054-2f18b49f41f3" />
+
+- static float pid_integral = 0.0f; // Stores the accumulated error over time (Integral term memory).
+
+<img width="227" height="26" alt="image" src="https://github.com/user-attachments/assets/6b28688a-a930-4dcf-9ed3-dcacb3193bb3" />
+<img width="232" height="31" alt="image" src="https://github.com/user-attachments/assets/b33db447-1623-40f4-aa31-4a4486f1ec99" />
+
+- static float previous_error = 0.0f; // Stores the last error to compute the derivative (rate of change)
+
+<img width="188" height="43" alt="image" src="https://github.com/user-attachments/assets/b1e41a65-c3b2-4219-9ed9-2b9459bc97c9" />
+
 
 FanControl_Init(void):
 
@@ -164,18 +188,17 @@ Shift left by 4
 
 This part ensures you never exceed 100%
 
-- if (duty_percent > 100)
-    {
-        duty_percent = 100;
-    }
+<img width="258" height="68" alt="image" src="https://github.com/user-attachments/assets/475b856a-5de1-47bc-a5f8-c9ae83c9cf88" />
 
 This part store the current duty for later use.
 
-- fan_pwm_percent = duty_percent;
+<img width="181" height="18" alt="image" src="https://github.com/user-attachments/assets/3972d2d6-3662-486e-a56a-0955fcf5d6fe" />
+
 
 This part is compiled when #define FAN_PWM_INVERTED 0, which is our case the 2N2222.
 
-- TIM4->CCR1 = (duty_percent * (TIM4->ARR + 1)) / 100;
+<img width="325" height="29" alt="image" src="https://github.com/user-attachments/assets/0281bcf2-5867-44e7-9bd5-06f7256dbd46" />
+
 
 Step by step: TIM4-> ARR = 999 → ARR + 1 = 1000 counts.
 
@@ -190,54 +213,63 @@ This gives:
 
 This part returns the system time in milliseconds, now is the current timestamp used to decide if it’s time to read the DHT sensor again.
 
-- uint32_t now = HAL_GetTick();
+<img width="197" height="38" alt="image" src="https://github.com/user-attachments/assets/20d57eba-e271-4e01-b1d7-a9e03c32a60d" />
 
 This part computes how long it’s been since the last DHT read: now - last_dht_read_time. If this elapsed time is less than DHT_READ_PERIOD_MS (2000 ms), the function exits immediately. This means: “Too soon to read the sensor again, do nothing this cycle.” If enough time has passed, we continue.
 
-- if ((now - last_dht_read_time) < DHT_READ_PERIOD_MS)
-    {
-        return;
-    }
+<img width="295" height="50" alt="image" src="https://github.com/user-attachments/assets/4fb08527-84ae-4d2e-901d-adcff5e9ca17" />
+
 
 This part records that we’re about to perform a new DHT read at time now. Next call will measure time from this moment.
 
-- last_dht_read_time = now;
+<img width="152" height="20" alt="image" src="https://github.com/user-attachments/assets/c1d00c93-fae9-4332-b5b5-756ea72d890d" />
 
-The last part function is: DHT_Read(...) attempts to read the sensor. On success (returns non‑zero/true): It updates current_temperature and current_humidity. Then we compute the control action. On failure: For safety, the fan is turned OFF: Fan_SetPWM(0);.
+
+The last part function is: DHT_Read(...) attempts to read the sensor. If the attempt of reading the sensor success (returns non‑zero/true): It updates current_temperature and current_humidity. Then we compute the control action. If the attempt of reading the sensor fails: For safety, the fan is turned OFF: Fan_SetPWM(0);.
+
+<img width="326" height="59" alt="image" src="https://github.com/user-attachments/assets/98c6b26c-fc00-4d00-8c6f-d39dce0f5b91" />
+<img width="112" height="54" alt="image" src="https://github.com/user-attachments/assets/f2c8bace-faff-4b58-895c-3542c36d5349" />
 
 1. Compute temperature error. error = measured temperature − target temperature. If current_temperature > target → error > 0 → we need cooling. If current_temperature ≤ target → error ≤ 0 → no need to cool, pwm_value will hold the fan speed in percent (0–100). 
 
 - float error = current_temperature - FAN_TARGET_TEMP;
 - float pwm_value = 0.0f;
 
-2. Apply deadband. If the error is less than or equal to the deadband (e.g. 0.5°C), the fan is kept OFF. This avoids fan activity for tiny temperature deviations and sensor noise.
+2. Calculate dt, it's simply the time interval between one PID update and the next — the amount of real time that passes between two temperature readings. 
 
-3. Proportional control when error is significant. When error > FAN_DEADBAND, we compute a proportional control. Larger temperature difference → higher PWM → faster fan.
 
-- pwm_value = FAN_KP * error;
+Apply deadband. If the error is less than or equal to the deadband (e.g. 0.5°C), the fan is kept OFF. This avoids fan activity for tiny temperature deviations and sensor noise. When inside the deadband reset the integral. NOTE: this last part is important to prevent stored error from building up and causing a sudden, unnecessary fan speed jump when the temperature barely moves.
+
+<img width="262" height="124" alt="image" src="https://github.com/user-attachments/assets/aa3d6e23-f8da-4770-869f-9506e09618ac" />
+
+3. PID control when error is significant. When error > FAN_DEADBAND, we compute the PID control. Larger temperature difference → higher PWM → faster fan.
+
+
+PWM value is the sum of the P, I and D. Note: Anti‑windup stops the integral from growing too much when the output is saturated, preventing the fan from overreacting or staying at high speed longer than necessary. Remember I is the sum of all past errors, so it grows forever unless controlled.
+
+Save previews error for the devirate next calculation.
+
+<img width="384" height="268" alt="image" src="https://github.com/user-attachments/assets/6896e361-b5f1-4a9a-b875-16e2dea54be2" />
 
 4. Enforce minimum PWM. If the computed PWM is too small (below the minimum needed to reliably start the fan), it is raised to FAN_MIN_PWM (e.g. 30%). This avoids the fan stalling or buzzing at very low duty cycles.
 
-- if (pwm_value < FAN_MIN_PWM)
-{
-    pwm_value = FAN_MIN_PWM;
-}
+<img width="168" height="59" alt="image" src="https://github.com/user-attachments/assets/5cc7e084-41a0-4048-8699-8ae125ba6966" />
+
 
 5. Enforce maximum PWM. Caps the PWM at FAN_MAX_PWM (e.g. 100%). Protects the fan and ensures the duty cycle stays within valid bounds.
 
-- if (pwm_value > FAN_MAX_PWM)
-{
-    pwm_value = FAN_MAX_PWM;
-}
+<img width="163" height="49" alt="image" src="https://github.com/user-attachments/assets/e6250a1f-5bfa-4002-b144-c6c97d0fbf2c" />
+
 
 6. Apply the PWM to the hardware. Converts the float pwm_value to an 8‑bit integer (0–100). Calls Fan_SetPWM, which: stores fan_pwm_percent, converts the percentage into a CCR1 value using ARR, updates the timer’s PWM output.
 
-- Fan_SetPWM((uint8_t)pwm_value);
+<img width="193" height="20" alt="image" src="https://github.com/user-attachments/assets/93fe9380-b3ba-4baa-94b1-9f133ae8054d" />
+
 
 7. Sensor failure branch. If the DHT read fails, the system does not trust the temperature. As a safety measure, it turns the fan OFF instead of running it blindly.
 
-- else
-{
-    // If DHT reading fails, turn fan OFF for safety.
-    Fan_SetPWM(0);
-}
+<img width="112" height="54" alt="image" src="https://github.com/user-attachments/assets/f2c8bace-faff-4b58-895c-3542c36d5349" />
+
+Getters:
+
+<img width="209" height="166" alt="image" src="https://github.com/user-attachments/assets/0537ab56-39bf-498d-b4b2-c6c33b584909" />
