@@ -99,7 +99,7 @@ GPIOA->AFR[2] |= (0x01 << 24); Set the function, 0x01 = 0001, goes into bits [27
 
 0x1 → one active bit and shift to position 6.
 ~ → apply bitwise NOT, this inverts all the bits.
-&= → apply AND (the result is 1 only if both bits are 1). So, bit 8 is forced to 0 and all other bits remain unchanged.
+&= → apply AND (the result is 1 only if both bits are 1). So, bit 6 is forced to 0 and all other bits remain unchanged.
 Bit 6 = 0 → Push-Pull mode. To ensure the bit becomes 0, regardless of its previous value.
     
 <img width="348" height="175" alt="image" src="https://github.com/user-attachments/assets/d3cb0876-3f5d-40af-8b49-951ddaed1958" />
