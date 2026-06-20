@@ -2,6 +2,10 @@
 
 <img width="536" height="374" alt="image" src="https://github.com/user-attachments/assets/33e3eb97-cfb1-441b-a8f4-380add812709" />
 
+<img width="1600" height="878" alt="WhatsApp Image 2026-06-20 at 10 13 36" src="https://github.com/user-attachments/assets/a0dcd133-130b-409e-a775-432e0d323d27" />
+
+
+
 Fan Control Code Description
 
 - #define FAN_TARGET_TEMP 22.0f // Desired temperature in °C: Threshold
