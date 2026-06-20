@@ -20,31 +20,31 @@ Note: UART hardware delivers one byte at a time, so the interrupt handler reads 
 
 2. Temporary character buffer (accumulates characters): char rx_buffer[64]; // A 64‑character buffer where you accumulate incoming characters until a full command is received. Size 64 because it is enough space for typical commands. Prevents overflow.
 
-<img width="298" height="23" alt="image" src="https://github.com/user-attachments/assets/af68afa1-7c3c-4912-8bdb-9ec09936dabb" />
+- <img width="298" height="23" alt="image" src="https://github.com/user-attachments/assets/af68afa1-7c3c-4912-8bdb-9ec09936dabb" />
 
-<img width="196" height="241" alt="image" src="https://github.com/user-attachments/assets/e76b6ad5-b922-42b4-babe-52291fcd1c56" />
+- <img width="196" height="241" alt="image" src="https://github.com/user-attachments/assets/e76b6ad5-b922-42b4-babe-52291fcd1c56" />
 
 3. Final command buffer: char command[64]; // When a newline \n arrives, the interrupt copies the full command from rx_buffer into command.
 
 Note: Command becomes the stable, ready‑to‑process string. Meanwhile, rx_buffer can start receiving the next command.
 
-<img width="470" height="22" alt="image" src="https://github.com/user-attachments/assets/4cb26358-7ba2-4698-9582-54b24d7573f8" />
+- <img width="470" height="22" alt="image" src="https://github.com/user-attachments/assets/4cb26358-7ba2-4698-9582-54b24d7573f8" />
 
-<img width="188" height="237" alt="image" src="https://github.com/user-attachments/assets/b0ec8464-5291-4b3c-bc02-2d230c8790aa" />
+- <img width="188" height="237" alt="image" src="https://github.com/user-attachments/assets/b0ec8464-5291-4b3c-bc02-2d230c8790aa" />
 
 4. Index inside rx_buffer: uint8_t rx_index = 0; // Tracks where the next incoming character should be stored inside rx_buffer.
 
-<img width="458" height="26" alt="image" src="https://github.com/user-attachments/assets/aa81d67d-2ede-4474-ae52-6de061867f23" />
+- <img width="458" height="26" alt="image" src="https://github.com/user-attachments/assets/aa81d67d-2ede-4474-ae52-6de061867f23" />
 
-<img width="209" height="200" alt="image" src="https://github.com/user-attachments/assets/4a07b67f-af83-4474-a930-04b358565c09" />
+- <img width="209" height="200" alt="image" src="https://github.com/user-attachments/assets/4a07b67f-af83-4474-a930-04b358565c09" />
 
 5. Command‑ready flag: volatile uint8_t command_ready = 0; // A flag set by the UART interrupt: 0 → no complete command yet, 1 → a full command (ending in '\n') is ready.
 
 Note: It is volatile because it is modified inside an interrupt. The main loop must always read the latest value. It is used in the while loop, everytime a command is ready the variable is cleaned (set to 0) and the function process command is called.
 
-<img width="233" height="50" alt="image" src="https://github.com/user-attachments/assets/8a0f3880-2003-4b65-a77c-36e2d991eb1d" />
+- <img width="233" height="50" alt="image" src="https://github.com/user-attachments/assets/8a0f3880-2003-4b65-a77c-36e2d991eb1d" />
 
-<img width="130" height="59" alt="image" src="https://github.com/user-attachments/assets/48fbd6ee-7244-4daa-b245-f96a91246f90" />
+- <img width="130" height="59" alt="image" src="https://github.com/user-attachments/assets/48fbd6ee-7244-4daa-b245-f96a91246f90" />
 
 - Command Variables:
 
