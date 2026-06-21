@@ -66,8 +66,8 @@ Note: It is volatile because it is modified inside an interrupt. The main loop m
 
 - Private variables (HAL peripheral handles): These are HAL driver objects that represent your UART peripherals. Each handle stores: Baud rate, word length, stop bits, parity, hardware registers, DMA settings, Interrupt state. Every HAL function needs a handle to know which UART we’re talking to. Without these handles, the HAL cannot operate the UART hardware.
 
-huart1 → configuration + state for USART1 (Not used for this project communication)
-huart2 → configuration + state for USART2 (Used for this project communication)
+huart1 → configuration + state for USART1 (Used for ESP COM)
+huart2 → configuration + state for USART2 (Used for Debug, serial monitor,...)
 
 <img width="164" height="42" alt="image" src="https://github.com/user-attachments/assets/a05ce43e-3f8b-4ce6-8eb4-895316297b74" />
 
@@ -149,8 +149,13 @@ WHILE****
 
 - (Optional) Send status every 2 seconds: Currently commented out. Logic is similar to PIR timing: Every 2000 ms (2 s), call Send_Status(). This would periodically update the app/ESP8266 with system status.
 
+Communication Notes:
 
+- <img width="647" height="170" alt="image" src="https://github.com/user-attachments/assets/19813da0-029f-41ac-b96a-f91fdb725236" />
 
+- <img width="121" height="218" alt="image" src="https://github.com/user-attachments/assets/c2e38b47-6a9a-4fe5-8376-55bc0e68276e" />
+
+- <img width="126" height="158" alt="image" src="https://github.com/user-attachments/assets/00d123b3-f05f-4df1-9d16-3a8bb388aaa3" />
 
 
 
