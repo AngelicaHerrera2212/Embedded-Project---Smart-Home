@@ -157,6 +157,75 @@ Communication Notes:
 
 - <img width="126" height="158" alt="image" src="https://github.com/user-attachments/assets/00d123b3-f05f-4df1-9d16-3a8bb388aaa3" />
 
+Function: void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart): this function is called AUTOMATICALLY by HAL.
+Every time one byte is received through UART (because we used HAL_UART_Receive_IT), HAL triggers this callback. huart (1 or 2) indicates which UART generated the interrupt.
+
+1. The next part that the interrupt comes from USART1. The MCU may have several UARTs (USART1, USART2, USART3…), this callback is shared, so we have to check if specifically USART1 receive the byte. If yes → process the byte, If not → ignore.
+
+<img width="176" height="27" alt="image" src="https://github.com/user-attachments/assets/19b0cb97-3f21-41f6-bce5-e040e40a563e" />
+
+2. The next part is to confirm if the received byte is a newline (‘\n’). This means “The command is complete.” Remember that the ESP8266 sends commands ending with \n.
+
+<img width="130" height="28" alt="image" src="https://github.com/user-attachments/assets/f5edb74f-8699-400e-94b2-41be6cd6a402" />
+
+3. Terminate the received string. Adds the null terminator \0. This converts the buffer into a valid C string. Example: L I G H T : O N \0.
+
+After that, Copy the full command into the final buffer. Moves the command from the temporary buffer (rx_buffer). Into the final buffer (command). This allows the temporary buffer to start receiving the next command.
+
+Then reset the buffer index. This prepares the buffer for the next command. The next byte will go into rx_buffer[0]
+
+And signal the main loop that a command is ready. This flag tells the main program: “A full command has been received and is ready to be processed.”
+
+<img width="157" height="56" alt="image" src="https://github.com/user-attachments/assets/72881894-221a-40bb-a051-00e87464a174" />
+
+4.  If the byte is NOT ‘\n’ and NOT ‘\r’. \r (carriage return) is ignored. Which means other byte is part of that command.
+
+<img width="168" height="25" alt="image" src="https://github.com/user-attachments/assets/64d600f3-12a5-49a8-8ed5-86b7f823e5b8" />
+
+5. In case the past condition is true, next is to store the byte in the temporary buffer. This prevents buffer overflow, saves the received byte, increments rx_index for the next byte.
+
+<img width="230" height="161" alt="image" src="https://github.com/user-attachments/assets/47fa3396-a292-455a-96b1-5610e3808aee" />
+
+<img width="217" height="50" alt="image" src="https://github.com/user-attachments/assets/450a7819-0a73-4f3b-b4da-062f379094d9" />
+
+6. Re‑enable UART interrupt reception. This is critical because reactivates reception of another byte. UART receives one byte at a time, without this line, UART would stop receiving data.
+
+It creates a loop: 1 byte received → callback → re‑enable reception → wait for next byte
+
+<img width="305" height="38" alt="image" src="https://github.com/user-attachments/assets/e17a3b58-cf01-49ca-a046-ed08022335d9" />
+
+Function: void Process_Command(void): This is the function that processes the command received from UART (ESP8266 → STM32).
+
+1. Check if the command starts with "PASS:" strncmp compares the first 5 characters of command with "PASS:". If the command begins with "PASS:", then this is a password authentication command. Example command: PASS:1234
+
+<img width="228" height="16" alt="image" src="https://github.com/user-attachments/assets/2f0b09eb-70b0-40f5-a52f-8296f7f1a6da" />
+
+2. Extract the password sent by the user. Moves the pointer 5 characters forward. Skips "PASS:" and points directly to the password. Example: command = "PASS:1234". received_password = "1234".
+
+<img width="217" height="16" alt="image" src="https://github.com/user-attachments/assets/93fab396-b60b-4028-ac4d-68404c54b5f4" />
+
+
+3. Compare received password with the correct one. strcmp returns 0 if both strings are identical. If the password is correct → enter the “ACCESS GRANTED” block.
+
+<img width="305" height="24" alt="image" src="https://github.com/user-attachments/assets/ff9b7b70-b48b-46a2-9bb7-d21b7b5a742d" />
+
+4. ACCESS GRANTED block: Reset wrong attempts counter. Mark door as open. Physically move servo to open the door. Disable alarm.
+
+<img width="119" height="47" alt="image" src="https://github.com/user-attachments/assets/16aca784-501e-4644-af88-3ecb2b021902" />
+
+5. HAL_UART_Transmit — ACCESS GRANTED
+
+&huart1: Selects UART1 as the transmitter. 
+
+(uint8_t*)"ACK:ACCESS_GRANTED\n": This is the message sent back to the ESP8266. It is a string literal, cast to uint8_t* because HAL expects bytes. 
+
+strlen("ACK:ACCESS_GRANTED\n"): Calculates how many bytes to send. This ensures the exact length is transmitted.
+
+100: Timeout in milliseconds. If UART cannot send the message within 100 ms, the function returns an error.
+
+Behavior: Blocking transmit → the CPU waits until all bytes are sent. Sends the message immediately.
+
+
 
 
 
