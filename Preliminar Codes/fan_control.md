@@ -108,7 +108,7 @@ Bit 6 = 0 → Push-Pull mode. To ensure the bit becomes 0, regardless of its pre
     
 <img width="343" height="196" alt="image" src="https://github.com/user-attachments/assets/57571083-89cf-494c-918d-a2e471e3ab96" />
 
-- GPIOB->OSPEEDR &= ~(0x03 << 12); / GPIOB->OSPEEDR |=  (0x02 << 12); // High speed output: GPIOB->OSPEEDR is the output speed register for port B on an STM32‑style MCU. Each pin uses 2 bits in this register.
+- GPIOB->OSPEEDR &= ~(0x03 << 12); / GPIOB->OSPEEDR |=  (0x02 << 12); // Fast speed output: GPIOB->OSPEEDR is the output speed register for port B on an STM32‑style MCU. Each pin uses 2 bits in this register.
 
 GPIOB->OSPEEDR &= ~(0x03 << 12):
 0x03 in binary is 0000 0011 → two bits set: 11. Shifts those  bits to position 12. 
