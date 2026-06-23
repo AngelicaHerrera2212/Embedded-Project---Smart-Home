@@ -35,6 +35,10 @@ They need a “kick” to overcome static friction.
 
 - #define FAN_MAX_PWM 100 // Maximum PWM: This caps the fan speed at 100% duty cycle.
 
+- #define FAN_INTEGRAL_MAX      50.0f   // Anti-windup max: The integral term is not allowed to grow above +50.
+
+- #define FAN_INTEGRAL_MIN     -50.0f   // Anti-windup min: The integral term is not allowed to go below –50.
+
 - #define DHT_READ_PERIOD_MS 2000 // DHT should not be read too fast: The DHT11 temperature–humidity sensors cannot be polled too frequently. They require ~2 seconds between reads.
 
 - #define FAN_PWM_INVERTED 0 // FAN DRIVER TYPE: With a 2N2222 transistor when the PWM pin goes HIGH, current flows into the base, transistor turns ON, fan gets ground and fan spins.
