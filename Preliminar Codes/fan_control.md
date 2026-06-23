@@ -166,7 +166,10 @@ Shift left by 4
 
 - TIM4->CCER |= (0x1 << 0); // Enable channel 1 output: Enable channel 1 output: Controls whether each channel output is actually sent to the pin. Without this, the timer runs, PWM is generated internally but nothing appears on the pin.
 
-<img width="286" height="66" alt="image" src="https://github.com/user-attachments/assets/9c65b768-21c1-4aec-aeec-b8addc1d6c39" />
+<img width="486" height="103" alt="image" src="https://github.com/user-attachments/assets/b3c0f92a-2b9d-4507-8be0-580cc0d2a39f" />
+
+<img width="380" height="162" alt="image" src="https://github.com/user-attachments/assets/e5bb94ca-6cfe-4863-8a44-54492da7ceec" />
+
 
 - TIM4->CR1 |= (0x1 << 7); // Enable auto-reload preload: Enable auto-reload preload: CR1 = Control Register 1, it controls the main behavior of the timer. New ARR value is stored in a shadow register. It only takes effect at the next update event (counter reset).
 
