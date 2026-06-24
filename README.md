@@ -25,6 +25,10 @@ Connections eschematic:
 <p align="center">
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/84bb79df-c5ad-4578-b288-2d0d0e3b39d4" />
 
+Baseline to select the pins: Using as reference the Alternate Function tables for identifying first the pins for Timer PWM (servo and dc fan) and UART Comunication Rx and Tx. Then select the pins for the other components.
+
+<img width="575" height="385" alt="image" src="https://github.com/user-attachments/assets/6f2153d4-40be-48d7-ad9f-0e16cf0663ce" />
+
 Fine State Machine
 
 <img width="1236" height="1272" alt="image" src="https://github.com/user-attachments/assets/c7e40c63-e077-4487-bafc-ce0e227602b5" />
