@@ -10,7 +10,7 @@ Using:
 * Servo SG90
 * 5V Fan
 * PIR
-* DHT22
+* DHT11
 * LEDs
 * Buzzer
 
